@@ -1,11 +1,11 @@
-// src/views/home.jsx
-import Hero from '../components/hero';
+import Hero from '../components/Hero';
+import ContainProducts from '../components/ContainProducts';
 
 const Home = () => {
   return (
     <>
-      {/* Por ahora solo mostramos el Hero acá arriba */}
       <Hero />
+      <ContainProducts />
     </>
   );
 };

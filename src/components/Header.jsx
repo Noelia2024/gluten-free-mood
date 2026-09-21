@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { 
   AppBar, Container, Toolbar, Box, Typography, IconButton, 
   Menu, MenuItem, Button, Badge , Avatar
@@ -8,6 +8,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useTheme } from '@mui/material/styles';
+import { Link } from 'react-router-dom';
 
 // Importaciones de tus contextos y recursos
 import { ColorModeContext } from '../context/ThemeContext'; 
@@ -45,8 +46,8 @@ function Header() {
             <Typography
               variant="h6"
               noWrap
-              component="a"
-              href="/"
+              component={Link}
+              to="/"
               sx={{
                 fontFamily: 'inherit',
                 fontWeight: 700,
@@ -84,7 +85,7 @@ function Header() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} component={Link} to="/" onClick={handleCloseNavMenu}>
                   <Typography sx={{ textAlign: 'center', fontFamily: 'inherit', fontWeight: 500 }}>
                     {page}
                   </Typography>
@@ -97,8 +98,8 @@ function Header() {
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="/"
+            component={Link}
+            to="/"
             sx={{
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
@@ -121,6 +122,8 @@ function Header() {
             {pages.map((page) => (
               <Button
                 key={page}
+                component={Link}
+                to="/"
                 onClick={handleCloseNavMenu}
                 sx={{ 
                   my: 2, 
@@ -151,7 +154,7 @@ function Header() {
             }}
           >
             {/* 🛒 Carrito de compras */}
-            <IconButton color="inherit" aria-label="cart" sx={{ p: { xs: 0.5, sm: 1 } }}>
+            <IconButton component={Link} to="/carrito" color="inherit" aria-label="cart" sx={{ p: { xs: 0.5, sm: 1 } }}>
               <Badge badgeContent={0} color="error">
                 <ShoppingCartIcon sx={{color: headerColor, fontSize: { xs: '1.3rem', sm: '1.5rem' } }} />
               </Badge>
