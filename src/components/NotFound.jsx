@@ -22,7 +22,7 @@ const NotFound = () => {
       <Typography variant="body1" color="text.secondary">
         La página que buscás no existe o fue movida.
       </Typography>
-      <Button component={Link} to="/" variant="contained" size="large">
+      <Button component={Link} to="/productos" variant="contained" size="large">
         Volver al catálogo
       </Button>
     </Box>

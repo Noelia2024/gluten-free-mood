@@ -8,17 +8,22 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useTheme } from '@mui/material/styles';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 // Importaciones de tus contextos y recursos
 import { ColorModeContext } from '../context/ThemeContext'; 
 import glutenfreemood from '../assets/glutenfreemood.jpg'; 
 
-const pages = ['Productos', 'Precios', 'Blog'];
+const pages = [
+  { label: 'Productos', to: '/productos' },
+  { label: 'Precios', to: '/' },
+  { label: 'Blog', to: '/' },
+];
 
 function Header() {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
+  const location = useLocation();
   const [anchorElNav, setAnchorElNav] = useState(null);
 
   const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
@@ -85,9 +90,15 @@ function Header() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} component={Link} to="/" onClick={handleCloseNavMenu}>
+                <MenuItem
+                  key={page.label}
+                  component={Link}
+                  to={page.to}
+                  onClick={handleCloseNavMenu}
+                  aria-current={location.pathname === page.to ? 'page' : undefined}
+                >
                   <Typography sx={{ textAlign: 'center', fontFamily: 'inherit', fontWeight: 500 }}>
-                    {page}
+                    {page.label}
                   </Typography>
                 </MenuItem>
               ))}
@@ -121,10 +132,11 @@ function Header() {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: 2 }}>
             {pages.map((page) => (
               <Button
-                key={page}
+                key={page.label}
                 component={Link}
-                to="/"
+                to={page.to}
                 onClick={handleCloseNavMenu}
+                aria-current={location.pathname === page.to ? 'page' : undefined}
                 sx={{ 
                   my: 2, 
                   color: headerColor, 
@@ -136,7 +148,7 @@ function Header() {
                   mx: 1
                 }}
               >
-                {page}
+                {page.label}
               </Button>
             ))}
           </Box>
