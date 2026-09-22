@@ -8,9 +8,14 @@ import {
   Card,
   CardMedia,
   CardContent,
+  CardActions,
+  Button,
 } from '@mui/material';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import { useCart } from '../context/CartContext';
 
 const Products = () => {
+  const { addItem } = useCart();
   const [productos, setProductos] = useState([]);
 
   useEffect(() => {
@@ -69,6 +74,17 @@ const Products = () => {
                     </Typography>
                   )}
                 </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    size="small"
+                    startIcon={<AddShoppingCartIcon />}
+                    onClick={() => addItem(prod)}
+                  >
+                    Agregar al carrito
+                  </Button>
+                </CardActions>
               </Card>
             </Grid>
           ))}

@@ -12,6 +12,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 // Importaciones de tus contextos y recursos
 import { ColorModeContext } from '../context/ThemeContext'; 
+import { useCart } from '../context/CartContext'; 
 import glutenfreemood from '../assets/glutenfreemood.jpg'; 
 
 const pages = [
@@ -23,6 +24,7 @@ const pages = [
 function Header() {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
+  const { totalItems } = useCart();
   const location = useLocation();
   const [anchorElNav, setAnchorElNav] = useState(null);
 
@@ -166,8 +168,8 @@ function Header() {
             }}
           >
             {/* 🛒 Carrito de compras */}
-            <IconButton component={Link} to="/carrito" color="inherit" aria-label="cart" sx={{ p: { xs: 0.5, sm: 1 } }}>
-              <Badge badgeContent={0} color="error">
+            <IconButton component={Link} to="/carrito" color="inherit" aria-label={`Carrito (${totalItems})`} sx={{ p: { xs: 0.5, sm: 1 } }}>
+              <Badge badgeContent={totalItems} color="error">
                 <ShoppingCartIcon sx={{color: headerColor, fontSize: { xs: '1.3rem', sm: '1.5rem' } }} />
               </Badge>
             </IconButton>
