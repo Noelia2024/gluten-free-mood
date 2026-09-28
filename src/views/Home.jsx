@@ -1,13 +1,7 @@
-// src/views/home.jsx
-import Hero from '../components/hero';
+import Hero from '../components/Hero';
 
 const Home = () => {
-  return (
-    <>
-      {/* Por ahora solo mostramos el Hero acá arriba */}
-      <Hero />
-    </>
-  );
+  return <Hero />;
 };
 
 export default Home;
