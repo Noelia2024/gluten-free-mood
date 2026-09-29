@@ -17,8 +17,6 @@ import glutenfreemood from '../assets/glutenfreemood.jpg';
 
 const pages = [
   { label: 'Productos', to: '/productos' },
-  { label: 'Precios', to: '/' },
-  { label: 'Blog', to: '/' },
 ];
 
 function Header() {
@@ -31,11 +29,12 @@ function Header() {
   const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
   const handleCloseNavMenu = () => setAnchorElNav(null);
 
-  // 🎨 Truco: Definimos el color de los elementos del Header según el modo
-  const headerColor = theme.palette.mode === 'dark' ? 'text.primary' : '#ffffff';
+  // El AppBar usa primary.main como fondo; primary.contrastText es el
+  // foreground que pasa AA en los dos modos, asi que un solo token alcanza.
+  const headerColor = 'primary.contrastText';
 
   return (
-    <AppBar position="static" elevation={1}>
+    <AppBar position="sticky" elevation={1}>
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
           
@@ -56,7 +55,6 @@ function Header() {
               component={Link}
               to="/"
               sx={{
-                fontFamily: 'inherit',
                 fontWeight: 700,
                 letterSpacing: '.05rem',
                 color: headerColor,
@@ -91,19 +89,32 @@ function Header() {
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              {pages.map((page) => (
-                <MenuItem
-                  key={page.label}
-                  component={Link}
-                  to={page.to}
-                  onClick={handleCloseNavMenu}
-                  aria-current={location.pathname === page.to ? 'page' : undefined}
-                >
-                  <Typography sx={{ textAlign: 'center', fontFamily: 'inherit', fontWeight: 500 }}>
-                    {page.label}
-                  </Typography>
-                </MenuItem>
-              ))}
+              {pages.map((page) => {
+                const isActive = location.pathname === page.to;
+
+                return (
+                  <MenuItem
+                    key={page.label}
+                    component={Link}
+                    to={page.to}
+                    onClick={handleCloseNavMenu}
+                    selected={isActive}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {/* selected es solo un cambio de fondo: la señal real la
+                        dan el peso y el subrayado, para no depender del color. */}
+                    <Typography
+                      sx={{
+                        textAlign: 'center',
+                        fontWeight: isActive ? 700 : 500,
+                        textDecoration: isActive ? 'underline' : 'none',
+                      }}
+                    >
+                      {page.label}
+                    </Typography>
+                  </MenuItem>
+                );
+              })}
             </Menu>
           </Box>
 
@@ -117,7 +128,6 @@ function Header() {
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
               ml: { xs: 1, sm: 2 },
-              fontFamily: 'inherit',
               fontWeight: 700,
               color: headerColor,
               textDecoration: 'none',
@@ -132,27 +142,45 @@ function Header() {
               CENTRO: MENÚ DE NAVEGACIÓN (Solo Desktop)
              ────────────────────────────────────────────────────────────── */}
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: 2 }}>
-            {pages.map((page) => (
-              <Button
-                key={page.label}
-                component={Link}
-                to={page.to}
-                onClick={handleCloseNavMenu}
-                aria-current={location.pathname === page.to ? 'page' : undefined}
-                sx={{ 
-                  my: 2, 
-                  color: headerColor, 
-                  display: 'block',
-                  fontFamily: 'inherit',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  fontSize: '1rem',
-                  mx: 1
-                }}
-              >
-                {page.label}
-              </Button>
-            ))}
+            {pages.map((page) => {
+              const isActive = location.pathname === page.to;
+
+              return (
+                <Button
+                  key={page.label}
+                  component={Link}
+                  to={page.to}
+                  onClick={handleCloseNavMenu}
+                  aria-current={isActive ? 'page' : undefined}
+                  sx={{
+                    my: 2,
+                    color: headerColor,
+                    display: 'block',
+                    position: 'relative',
+                    fontSize: '1rem',
+                    mx: 1,
+                    // Señal de ruta activa con tres señales no-cromáticas:
+                    // peso, subrayado y barra. La barra usa currentColor, así
+                    // que hereda el color ya resuelto y no puede desincronizarse.
+                    ...(isActive && {
+                      fontWeight: 700,
+                      textDecoration: 'underline',
+                      textUnderlineOffset: '6px',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        left: 8,
+                        right: 8,
+                        bottom: 4,
+                        borderBottom: '3px solid currentColor',
+                      },
+                    }),
+                  }}
+                >
+                  {page.label}
+                </Button>
+              );
+            })}
           </Box>
 
           {/* ──────────────────────────────────────────────────────────────
