@@ -1,7 +1,7 @@
 // src/components/Hero.jsx
 import { Box, Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import heroCutout from '../assets/glutefreemood-removebg-preview.png';
+import heroCutout from '../assets/glutefreemood.png';
 
 const Hero = () => {
   return (
@@ -47,13 +47,18 @@ const Hero = () => {
             es el mismo naranja del fondo del hero. La caja del boton quedaria
             invisible. secondary.main (deepOrange 900) es el unico tono del
             theme con contraste real contra primary.main. */}
+        {/* display por breakpoint a proposito: en desktop el nav ya tiene el
+            link "Productos", asi que el boton del hero es redundante y queda
+            como segundo enlace identico a 10 px de la foto. En mobile el nav
+            esta escondido tras el hamburguesa, asi que este boton es el unico
+            camino visible al catalogo. */}
         <Button
           variant="contained"
           size="large"
           color="secondary"
           component={Link}
           to="/productos"
-          sx={{ mt: 3 }}
+          sx={{ mt: 3, display: { xs: 'inline-flex', md: 'none' } }}
         >
           Ver productos
         </Button>
