@@ -1,7 +1,7 @@
 // src/components/Hero.jsx
 import { Box, Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import heroCutout from '../assets/glutefreemood.png';
+import heroCutout from '../assets/hero-pan-cutout.png';
 
 const Hero = () => {
   return (
@@ -32,7 +32,7 @@ const Hero = () => {
           component="h1"
           sx={{ fontSize: { xs: '2.5rem', md: '4.5rem' }, mb: 1 }}
         >
-          Gluten-Free Mood
+          Gluten-Free-Mood
         </Typography>
 
         <Typography
@@ -70,7 +70,7 @@ const Hero = () => {
       <Box
         component="img"
         src={heroCutout}
-        alt="Gluten-Free Mood, panadería artesanal libre de gluten"
+        alt="Gluten-Free-Mood, panadería artesanal libre de gluten"
         sx={{
           position: 'relative',
           zIndex: 1,
