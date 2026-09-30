@@ -1,7 +1,7 @@
 // src/components/Hero.jsx
 import { Box, Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import heroCutout from '../assets/hero-pan-cutout.png';
+import heroCutout from '../assets/hero-pan-cutout.webp';
 
 const Hero = () => {
   return (
