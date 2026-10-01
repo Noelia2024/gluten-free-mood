@@ -1,0 +1,14 @@
+# Ajustes de pnpm para ESTE repositorio.
+#
+# Sin este archivo, pnpm sube hasta el workspace del home del usuario
+# (C:\Users\Noelia\pnpm-workspace.yaml), trata el home como raiz del workspace,
+# y por eso `pnpm install` no escribe el lockfile aca ni opera sobre este proyecto.
+# Este archivo marca la raiz del proyecto y lo aísla de ese workspace externo.
+#
+# Clave `allowBuilds` (pnpm 11; antes se llamaba `onlyBuiltDependencies`).
+# Sin esto `pnpm install --frozen-lockfile` sale con codigo 1 y Vercel no construye.
+allowBuilds:
+  # Genera codigo en postinstall; los imports fallan si no corre.
+  protobufjs: true
+  # Requerido por el cliente de Firestore.
+  '@firebase/util': true
