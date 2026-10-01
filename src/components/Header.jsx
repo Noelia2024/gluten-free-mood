@@ -13,10 +13,11 @@ import { Link, useLocation } from 'react-router-dom';
 // Importaciones de tus contextos y recursos
 import { ColorModeContext } from '../context/ThemeContext'; 
 import { useCart } from '../context/CartContext'; 
-import logoHeader from '../assets/logo-header.jpg'; 
+import glutenfreemood from '../assets/glutenfreemood.jpg'; 
 
 const pages = [
   { label: 'Productos', to: '/productos' },
+  { label: 'Sobre mí', to: '/sobre-mi' },
 ];
 
 function Header() {
@@ -45,7 +46,7 @@ function Header() {
           {/*  VISTA DESKTOP: Logo + Nombre (Se ocultan en celular) */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', mr: 2 }}>
             <Avatar
-              src={logoHeader}
+              src={glutenfreemood}
               alt="Gluten-Free-Mood Logo"
               sx={{ width: 40, height: 40, mr: 1.5 }}
             />
