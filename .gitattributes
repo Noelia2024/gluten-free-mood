@@ -1,0 +1,11 @@
+# Normalize every text file to LF in both the repository and the working tree.
+#
+# Why: this repo had no .gitattributes, so line endings and the UTF-8 BOM were
+# decided by whatever tool wrote the file last. A README rewrite under
+# core.autocrlf=true added a BOM and produced mojibake (UTF-8 read as
+# Windows-1252). Pinning the encoding contract here makes the result
+# deterministic instead of tool-dependent.
+#
+# `text=auto` lets git detect binary content and leave it untouched, so image
+# and font assets stay safe.
+* text=auto eol=lf
