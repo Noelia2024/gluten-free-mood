@@ -24,6 +24,12 @@ import { useCart, lineTotal } from '../context/CartContext';
 // Si falta, el botón de checkout queda deshabilitado (degradación visual, sin crash).
 const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER;
 
+// Nombre, Precio e Imagen son OPCIONALES en Firestore. La tarjeta y la fila del
+// carrito ya caian a "Producto sin nombre", pero el mensaje de WhatsApp
+// interpolaba el campo crudo y el cliente recibia la palabra "undefined" en su
+// pedido. Un solo lugar decide el texto visible.
+const nombreDe = (item) => item.Nombre || 'Producto sin nombre';
+
 const Cart = () => {
   const { items, totalPrice, increment, decrement, removeItem, catalogoError, catalogoCargando } =
     useCart();
@@ -46,7 +52,7 @@ const Cart = () => {
   const handleCheckout = () => {
     const msg = [
       '¡Hola! Quiero hacer este pedido:',
-      ...items.map((i) => `- ${i.Nombre} x${i.qty} — $${lineTotal(i)}`),
+      ...items.map((i) => `- ${nombreDe(i)} x${i.qty} — $${lineTotal(i)}`),
       '',
       `TOTAL: $${totalPrice}`,
       nota ? `\n${nota}` : '',
@@ -112,13 +118,15 @@ const Cart = () => {
                       />
                     )}
                     <ListItemText
-                      primary={item.Nombre || 'Producto sin nombre'}
+                      primary={nombreDe(item)}
                       secondary={
                         sinVerificar
                           ? 'Precio sin verificar'
                           : noDisponible
                             ? 'No disponible — quitá esta línea para poder finalizar la compra'
-                            : `$${item.Precio} c/u`
+                            : item.Precio != null
+                              ? `$${item.Precio} c/u`
+                              : 'Precio sin definir'
                       }
                       slotProps={
                         noDisponible && !sinVerificar
