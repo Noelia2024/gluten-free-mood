@@ -13,7 +13,7 @@ import { Link, useLocation } from 'react-router-dom';
 // Importaciones de tus contextos y recursos
 import { ColorModeContext } from '../context/ThemeContext'; 
 import { useCart } from '../context/CartContext'; 
-import glutenfreemood from '../assets/glutenfreemood.jpg'; 
+import glutenfreemood from '../assets/logo-header.jpg'; 
 
 const pages = [
   { label: 'Productos', to: '/productos' },

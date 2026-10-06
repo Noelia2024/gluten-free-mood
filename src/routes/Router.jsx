@@ -3,7 +3,6 @@ import Layout from '../components/Layout';
 import Home from '../views/Home';
 import Products from '../views/Products';
 import AboutMe from '../views/AboutMe';
-import DetailProduct from '../views/DetailProduct';
 import Cart from '../views/Cart';
 import NotFound from '../components/NotFound';
 
@@ -14,7 +13,6 @@ const Router = () => {
         <Route index element={<Home />} />
         <Route path="productos" element={<Products />} />
         <Route path="sobre-mi" element={<AboutMe />} />
-        <Route path="producto/:id" element={<DetailProduct />} />
         <Route path="carrito" element={<Cart />} />
         <Route path="*" element={<NotFound />} />
       </Route>
