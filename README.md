@@ -215,6 +215,22 @@ El `id` del documento **no** es un campo: es el identificador de Firestore y se 
 > ⚠️ Los nombres de campo son **capitalizados y en español**. Son las claves que lee el código, no
 > etiquetas de una interfaz. Renombrarlas rompe la vista sin avisar.
 
+### 🔒 Reglas de seguridad
+
+Las reglas que protegen la base están versionadas en [`firestore.rules`](./firestore.rules) y hay que
+publicarlas desde **Firebase Console → Firestore Database → Rules**.
+
+El criterio sale de lo que la app hace: **solo lee**. No hay escrituras ni autenticación en el
+proyecto, así que la lectura del catálogo es pública y toda escritura queda prohibida. Editar
+productos desde la consola sigue funcionando porque la consola ignora estas reglas.
+
+> ⚠️ La API key de Firebase viaja dentro del bundle del navegador y es pública por diseño. La
+> seguridad no la da la key, la dan estas reglas. Con `allow read, write: if true` cualquiera puede
+> cambiar precios o borrar productos con solo abrir las DevTools.
+
+En `firestore.rules` está el detalle completo: por qué son estas reglas, cómo verificarlas en el
+Rules Playground y qué hacer si algún día la app necesita escribir.
+
 ---
 
 ## 🛒 Persistencia del carrito
@@ -307,6 +323,7 @@ Vercel construye la rama de producción en cada push. apuntala a **`main`**.
 
 - [ ] Las siete variables existen en el entorno de producción
 - [ ] `vercel.json` está commiteado
+- [ ] Las reglas de [`firestore.rules`](./firestore.rules) están publicadas y el Rules Playground responde `read allowed` + `write denied`
 - [ ] El build local pasó: `pnpm lint && pnpm build`
 
 ---

@@ -1,0 +1,110 @@
+rules_version = '2';
+
+// ---------------------------------------------------------------------------
+// Reglas de Firestore — e-commerce gluten-free-mood
+// ---------------------------------------------------------------------------
+//
+// PUBLICAR DESDE: Firebase Console -> Firestore Database -> Rules -> Publish
+//
+// Ojo: en algunas versiones de la consola el Rules Playground lee las reglas
+// del tab de Rules y no tiene editor propio, asi que no se puede testear antes
+// de publicar. El orden real es publicar y despues verificar en el Playground
+// y en el navegador.
+//
+// ---------------------------------------------------------------------------
+// POR QUE SON ASI
+// ---------------------------------------------------------------------------
+//
+// La API key de Firebase (VITE_FIREBASE_API_KEY) viaja dentro del bundle de
+// JavaScript. Cualquiera que abra la tienda en el navegador puede leerla. Eso
+// NO es un error de configuracion: es el diseno de Firebase, porque para que
+// el navegador hable con Firestore sin pedirte un usuario, la key tiene que
+// ser publica.
+//
+// Consecuencia: la seguridad NO la da la key, la dan estas reglas. Con
+// `allow read, write: if true` la tienda es publica para escribir y cualquiera
+// que abra las DevTools ve el ID del proyecto y cambia precios o borra
+// productos. Que la key este "oculta" no cuenta.
+//
+// En este proyecto la app cumple tres condiciones que hacen que estas reglas
+// sean las maximas posibles:
+//
+//   1. La app SOLO LEE. No hay addDoc, setDoc, updateDoc ni deleteDoc en src/.
+//   2. La app NO tiene autenticacion. No hay Firebase Auth en ningun archivo.
+//   3. Hay una sola coleccion: Productos.
+//
+// Como no hay nada que escribir, se prohibe toda escritura. No cuesta nada y
+// cierra la puerta.
+//
+// Editar precios y productos desde la consola de Firebase sigue funcionando:
+// la consola usa credenciales de administrador e ignora estas reglas por
+// completo. `allow write: if false` le cierra la puerta al navegador, no a vos.
+//
+// ---------------------------------------------------------------------------
+// QUE HACE CADA COSA
+// ---------------------------------------------------------------------------
+//
+// En Firestore existen solo dos operaciones reales de permiso: read y write.
+// Los tipos del simulador (get, list, create, update, delete) no son reglas
+// separadas, son formas de armar un pedido concreto para que el Playground lo
+// evalue:
+//
+//   read  -> cubre get  Y  list
+//   write -> cubre create, update  Y delete
+//
+// O sea que `allow read: if true` concede tambien el list. onSnapshot sobre
+// una coleccion es un list, y por eso el catalogo se puede escuchar en vivo.
+//
+// SEMANTICA OR: si varias reglas matchean la misma operacion, alcanza UNA que
+// conceda allow para que pase. Por eso el catch-all `if false` de abajo no le
+// pisa un `allow` legitimo de otra coleccion: sirve para dejar explicita la
+// intencion y cubrir todo lo no declarado. Lo que no matchea ninguna regla
+// queda denegado automaticamente.
+//
+// ---------------------------------------------------------------------------
+// COMO VERIFICAR QUE QUEDO BIEN
+// ---------------------------------------------------------------------------
+//
+// En el Rules Playground, con estas reglas ya publicadas:
+//
+//   get    en /Productos/test123   ->  Simulated read allowed
+//   create en /Productos/test123   ->  Simulated write denied
+//   update en /Productos/test123   ->  Simulated write denied
+//   delete en /Productos/test123   ->  Simulated write denied
+//
+// Ojo con el campo Location: si quedo con el texto gris de ejemplo
+// (/databases/(default)/documents/path/to/resource) esta VACIO y la
+// simulacion no corre. Hay que escribir la ruta a mano.
+//
+// El test definitivo es abrir la tienda: si los productos cargan y en
+// DevTools -> Console no aparece "Missing or insufficient permissions", el
+// read funciona. Eso tambien prueba el list, que el Playground de algunas
+// versiones no expone.
+//
+// ---------------------------------------------------------------------------
+// SI ALGO CAMBIA
+// ---------------------------------------------------------------------------
+//
+// Si alguna vez la app necesita escribir (pedidos, favoritos, cuentas), hay que
+// cambiar allow write: if false por una condicion real y verificar que no quede
+// abierta. Lo que NO hay que hacer es poner `if request.auth != null`: sin
+// Firebase Auth eso no protege nada, y con Firebase Auth permitiria a
+// cualquier cuenta con sesion iniciada, no solo a vos.
+// ---------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Catalogo publico: cualquier visitante necesita ver los productos.
+    match /Productos/{productoId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Cualquier otra coleccion: cerrada. Agregar aqui una coleccion nueva
+    // obliga a revisar este bloque a proposito.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
