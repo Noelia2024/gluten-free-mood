@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import  db  from "/src/fireStore.config";
 import {
   Container,
   Typography,
@@ -15,32 +12,22 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { useCart } from '../context/CartContext';
 
 const Products = () => {
-  const { addItem } = useCart();
-  const [productos, setProductos] = useState([]);
-
-  useEffect(() => {
-    const obtenerProductos = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "Productos"));
-        const lista = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProductos(lista);
-      } catch (error) {
-        console.error("Error al traer productos:", error);
-      }
-    };
-
-    obtenerProductos();
-  }, []);
+  // El catálogo lo provee CartProvider con una escucha en vivo a Productos:
+  // una sola lectura en toda la app, así catálogo y carrito nunca discrepan.
+  const { addItem, productos, catalogoCargando, catalogoError } = useCart();
 
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
       <Typography variant="h2" component="h2" gutterBottom>
         Nuestros Productos Sin TACC
       </Typography>
-      {productos.length === 0 ? (
+      {/* El error va antes que el estado de carga: si no, una falla de conexión
+          queda mostrando "Cargando productos..." para siempre. */}
+      {catalogoError ? (
+        <Typography variant="body1" color="error">
+          No pudimos cargar los productos. Revisá tu conexión e intentá de nuevo en unos segundos.
+        </Typography>
+      ) : catalogoCargando || productos.length === 0 ? (
         <Typography variant="body1" color="text.secondary">
           Cargando productos...
         </Typography>

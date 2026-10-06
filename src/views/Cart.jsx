@@ -1,5 +1,6 @@
 import { useState, Fragment } from 'react';
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -24,8 +25,23 @@ import { useCart, lineTotal } from '../context/CartContext';
 const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 const Cart = () => {
-  const { items, totalPrice, increment, decrement, removeItem } = useCart();
+  const { items, totalPrice, increment, decrement, removeItem, catalogoError, catalogoCargando } =
+    useCart();
   const [nota, setNota] = useState('');
+
+  // Hay líneas sin precio de catálogo: no se cobran y bloquean el checkout.
+  // No se under-cobra en silencio.
+  const hayNoDisponibles = items.some((i) => i.available === false);
+
+  // Ningún precio pudo verificarse: o el catálogo falló (conexión o
+  // configuración) o todavía no respondió. Ambas son la misma cosa para el
+  // cliente, y en las dos hay que decirlo a nivel catálogo en vez de acusar a
+  // los productos de estar borrados: quitar líneas no arregla una conexión.
+  const precioSinVerificar = Boolean(catalogoError) || catalogoCargando;
+
+  // Solo tiene sentido decir "ya no está en el catálogo" si el catálogo SÍ se
+  // pudo leer: con el catálogo caído no sabemos si el producto falta o no.
+  const hayProductosBorrados = precioSinVerificar ? false : hayNoDisponibles;
 
   const handleCheckout = () => {
     const msg = [
@@ -59,65 +75,89 @@ const Cart = () => {
         </Box>
       ) : (
         <>
+          {precioSinVerificar && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              No pudimos verificar los precios en este momento. Revisá tu conexión e intentá de
+              nuevo en unos segundos.
+            </Alert>
+          )}
+
           <List disablePadding>
-            {items.map((item) => (
-              <Fragment key={item.id}>
-                <ListItem
-                  alignItems="center"
-                  secondaryAction={
-                    <IconButton
-                      edge="end"
-                      aria-label={`Eliminar ${item.Nombre || 'producto'}`}
-                      onClick={() => removeItem(item.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  }
-                  sx={{ gap: { xs: 1, sm: 1.5 }, py: 2, pr: 7 }}
-                >
-                  {item.Imagen && (
-                    <Avatar
-                      variant="rounded"
-                      src={item.Imagen}
-                      alt={item.Nombre}
-                      sx={{ width: { xs: 56, sm: 56, md: 64 }, height: { xs: 56, sm: 56, md: 64 } }}
-                    />
-                  )}
-                  <ListItemText
-                    primary={item.Nombre || 'Producto sin nombre'}
-                    secondary={`$${item.Precio} c/u`}
-                    sx={{ minWidth: 0, flex: '1 1 auto' }}
-                  />
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: '0 0 auto' }}>
-                    <IconButton
-                      size="small"
-                      aria-label="Disminuir cantidad"
-                      disabled={item.qty <= 1}
-                      onClick={() => decrement(item.id)}
-                    >
-                      <RemoveIcon fontSize="small" />
-                    </IconButton>
-                    <Typography component="span" variant="body2" sx={{ minWidth: 24, textAlign: 'center' }}>
-                      {item.qty}
-                    </Typography>
-                    <IconButton
-                      size="small"
-                      aria-label="Aumentar cantidad"
-                      onClick={() => increment(item.id)}
-                    >
-                      <AddIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    sx={{ flex: '0 0 auto', fontWeight: 600, minWidth: 56, textAlign: 'right' }}
+            {items.map((item) => {
+              const noDisponible = item.available === false;
+              // Sin catálogo no se puede afirmar que el producto se borró: la
+              // línea queda en estado neutro en vez de marcar un falso "borrado".
+              const sinVerificar = noDisponible && precioSinVerificar;
+              return (
+                <Fragment key={item.id}>
+                  <ListItem
+                    alignItems="center"
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label={`Eliminar ${item.Nombre || 'producto'}`}
+                        onClick={() => removeItem(item.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    }
+                    sx={{ gap: { xs: 1, sm: 1.5 }, py: 2, pr: 7 }}
                   >
-                    ${lineTotal(item)}
-                  </Typography>
-                </ListItem>
-                <Divider component="li" />
-              </Fragment>
-            ))}
+                    {item.Imagen && (
+                      <Avatar
+                        variant="rounded"
+                        src={item.Imagen}
+                        alt={item.Nombre}
+                        sx={{ width: { xs: 56, sm: 56, md: 64 }, height: { xs: 56, sm: 56, md: 64 } }}
+                      />
+                    )}
+                    <ListItemText
+                      primary={item.Nombre || 'Producto sin nombre'}
+                      secondary={
+                        sinVerificar
+                          ? 'Precio sin verificar'
+                          : noDisponible
+                            ? 'No disponible — quitá esta línea para poder finalizar la compra'
+                            : `$${item.Precio} c/u`
+                      }
+                      slotProps={
+                        noDisponible && !sinVerificar
+                          ? { secondary: { color: 'error.main', fontWeight: 600 } }
+                          : undefined
+                      }
+                      sx={{ minWidth: 0, flex: '1 1 auto' }}
+                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: '0 0 auto' }}>
+                      <IconButton
+                        size="small"
+                        aria-label="Disminuir cantidad"
+                        disabled={item.qty <= 1}
+                        onClick={() => decrement(item.id)}
+                      >
+                        <RemoveIcon fontSize="small" />
+                      </IconButton>
+                      <Typography component="span" variant="body2" sx={{ minWidth: 24, textAlign: 'center' }}>
+                        {item.qty}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        aria-label="Aumentar cantidad"
+                        onClick={() => increment(item.id)}
+                      >
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      sx={{ flex: '0 0 auto', fontWeight: 600, minWidth: 56, textAlign: 'right' }}
+                    >
+                      {sinVerificar ? '—' : noDisponible ? 'Sin precio' : `$${lineTotal(item)}`}
+                    </Typography>
+                  </ListItem>
+                  <Divider component="li" />
+                </Fragment>
+              );
+            })}
           </List>
 
           <Box
@@ -132,7 +172,9 @@ const Cart = () => {
             <Typography variant="h6" component="h2">
               Total
             </Typography>
-            <Typography variant="h6">${totalPrice}</Typography>
+            {/* Con el catálogo caído el total da 0 sólo porque no se pudo cotizar nada:
+                mostrar "$0" sería mentir. */}
+            <Typography variant="h6">{precioSinVerificar ? '—' : `$${totalPrice}`}</Typography>
           </Box>
 
           <TextField
@@ -150,7 +192,7 @@ const Cart = () => {
             variant="contained"
             size="large"
             fullWidth
-            disabled={!items.length || !waNumber}
+            disabled={!items.length || !waNumber || hayNoDisponibles}
             onClick={handleCheckout}
           >
             Finalizar compra
@@ -158,6 +200,18 @@ const Cart = () => {
           {!waNumber && (
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
               Configurá VITE_WHATSAPP_NUMBER para habilitar el pedido
+            </Typography>
+          )}
+          {precioSinVerificar && (
+            <Typography variant="body2" color="error" sx={{ mt: 1, textAlign: 'center' }}>
+              No podemos enviar el pedido hasta verificar los precios. Revisá tu conexión e intentá
+              de nuevo en unos segundos.
+            </Typography>
+          )}
+          {hayProductosBorrados && (
+            <Typography variant="body2" color="error" sx={{ mt: 1, textAlign: 'center' }}>
+              Hay productos no disponibles en el carrito. Quitá esas líneas para poder finalizar la
+              compra.
             </Typography>
           )}
         </>
