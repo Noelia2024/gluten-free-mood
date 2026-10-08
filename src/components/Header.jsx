@@ -32,10 +32,18 @@ function Header() {
 
   // El AppBar usa primary.main como fondo; primary.contrastText es el
   // foreground que pasa AA en los dos modos, asi que un solo token alcanza.
-  const headerColor = 'primary.contrastText';
+  const headerColor = theme.palette.mode === 'dark'
+    ? theme.palette.text.primary
+    : 'primary.contrastText';
 
   return (
-    <AppBar position="sticky" elevation={1}>
+    <AppBar
+      position="sticky"
+      elevation={1}
+      sx={{
+        bgcolor: theme.palette.mode === 'dark' ? 'background.paper' : 'primary.main',
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
           

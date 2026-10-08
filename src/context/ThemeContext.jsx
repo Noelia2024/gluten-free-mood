@@ -53,9 +53,9 @@ export const ThemeContextProvider = ({ children }) => {
         : {
             // 🌙 COLORES MODO OSCURO (Corregidos para armonía visual)
             primary: {
-              main: colors.deepOrange[300], // El naranja de tu marca pero más suave para la noche
-              // 5.69:1 sobre #ff8a65. Antes resolvía al text.primary del header (2.22:1).
-              contrastText: colors.blueGrey[900],
+              main: colors.deepOrange[300], // El naranja de tu marca pero m�s suave para la noche
+              // Texto claro sobre naranja para mejor legibilidad en header/iconos
+              contrastText: colors.grey[50],
             },
             // 6.07:1 sobre #1e1e1e (el footer oscuro usa background.paper, no primary.main).
             secondary: { main: colors.deepOrange[400] },
