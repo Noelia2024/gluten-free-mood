@@ -26,7 +26,15 @@ const pilares = [
 const AboutMe = () => {
   return (
     <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
-      <Typography variant="h1" component="h1" gutterBottom>
+      {/* fontSize explicito: el theme no setea el tamano de h1, asi que MUI cae
+          a su default (96px) y el titulo revienta en mobile. Mismo patron que
+          Hero.jsx. El tope en desktop vuelve a la escala del theme (3rem/48px). */}
+      <Typography
+        variant="h1"
+        component="h1"
+        gutterBottom
+        sx={{ fontSize: { xs: '2rem', md: '3rem' } }}
+      >
         ¡Hola! Qué alegría que estés acá.
       </Typography>
 
@@ -72,10 +80,9 @@ const AboutMe = () => {
           vez, y convertir esa búsqueda en un proyecto real.
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-          Hoy, cada pan, factura, prepizza o elaboración que ves en la tienda no
-          está acá por casualidad. Pasó por infinitas pruebas hasta lograr la
-          calidad y el sabor que a mí misma me gusta llevar a mi mesa y
-          compartir con quienes más quiero.
+          Hoy cada elaboración que ves en la tienda no está acá por casualidad.
+          Pasó por infinitas pruebas hasta lograr la calidad y el sabor que a mí
+          misma me gusta llevar a mi mesa y compartir con quienes más quiero.
         </Typography>
 
         <Divider sx={{ my: { xs: 4, md: 6 } }} />
