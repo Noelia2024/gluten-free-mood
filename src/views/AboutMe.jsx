@@ -26,15 +26,7 @@ const pilares = [
 const AboutMe = () => {
   return (
     <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
-      {/* fontSize explicito: el theme no setea el tamano de h1, asi que MUI cae
-          a su default (96px) y el titulo revienta en mobile. Mismo patron que
-          Hero.jsx. El tope en desktop vuelve a la escala del theme (3rem/48px). */}
-      <Typography
-        variant="h1"
-        component="h1"
-        gutterBottom
-        sx={{ fontSize: { xs: '2rem', md: '3rem' } }}
-      >
+      <Typography variant="h1" component="h1" gutterBottom>
         ¡Hola! Qué alegría que estés acá.
       </Typography>
 
