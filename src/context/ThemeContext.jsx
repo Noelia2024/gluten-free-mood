@@ -1,5 +1,5 @@
 import { createContext, useState, useMemo, useContext } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { colors } from '@mui/material';
 
 // Familias: Amaranth es display (solo h1/h2), Signika es el cuerpo.
@@ -7,15 +7,17 @@ import { colors } from '@mui/material';
 const BODY_FONT = '"Signika", "Helvetica", "Arial", sans-serif';
 const DISPLAY_FONT = '"Amaranth", "Signika", "Helvetica", "Arial", sans-serif';
 
-// Escala estrictamente decreciente: 48 > 36 > 28 > 24 > 20 > 18 > 16.
-// h5 (300) es más liviano que body1 (400), así el fondo de la jerarquía no queda plano.
+// Escala estrictamente decreciente: 48 > 36 > 28 > 24 > 20 > 18.
+// Los valores de acá son el TOPE (desktop); responsiveFontSizes los baja en
+// mobile a 1 + (tope - 1) / 2. h5 (300) es más liviano que body1 (400), así
+// el fondo de la jerarquía no queda plano.
 const FONT_SIZES = {
-  h1: '3rem',      // 48px
-  h2: '2.25rem',   // 36px
-  h3: '1.75rem',   // 28px
-  h4: '1.5rem',    // 24px
-  h5: '1.25rem',   // 20px
-  h6: '1.125rem',  // 18px
+  h1: '3rem',      // 48px → 32px
+  h2: '2.25rem',   // 36px → 26px
+  h3: '1.75rem',   // 28px → 22px
+  h4: '1.5rem',    // 24px → 20px
+  h5: '1.25rem',   // 20px → 18px
+  h6: '1.125rem',  // 18px → 17px
 };
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -30,7 +32,7 @@ export const ThemeContextProvider = ({ children }) => {
     },
   }), []);
 
-  const theme = useMemo(() => createTheme({
+  const theme = useMemo(() => responsiveFontSizes(createTheme({
     palette: {
       mode,
       ...(mode === 'light'
@@ -72,21 +74,24 @@ export const ThemeContextProvider = ({ children }) => {
 
     typography: {
       fontFamily: BODY_FONT,
-      fontSizes: FONT_SIZES,
       // Amaranth sirve solo 400 y 700: al fijar esos dos pesos el browser
-      // nunca tiene que adivinar un nearest-match.
-      h1: { fontFamily: DISPLAY_FONT, fontWeight: 700, lineHeight: 1.1 },
-      h2: { fontFamily: DISPLAY_FONT, fontWeight: 400, lineHeight: 1.2 },
-      h3: { fontWeight: 500, lineHeight: 1.25 },
-      h4: { fontWeight: 400, lineHeight: 1.3 },
-      h5: { fontWeight: 300, lineHeight: 1.35 },
-      h6: { fontWeight: 600, lineHeight: 1.4 },
+      // nunca tiene que adivinar un nearest-match. El fontSize sale de
+      // FONT_SIZES, así la escala vive en un único lugar.
+      h1: { fontFamily: DISPLAY_FONT, fontWeight: 700, lineHeight: 1.1, fontSize: FONT_SIZES.h1 },
+      h2: { fontFamily: DISPLAY_FONT, fontWeight: 400, lineHeight: 1.2, fontSize: FONT_SIZES.h2 },
+      h3: { fontWeight: 500, lineHeight: 1.25, fontSize: FONT_SIZES.h3 },
+      h4: { fontWeight: 400, lineHeight: 1.3, fontSize: FONT_SIZES.h4 },
+      h5: { fontWeight: 300, lineHeight: 1.35, fontSize: FONT_SIZES.h5 },
+      h6: { fontWeight: 600, lineHeight: 1.4, fontSize: FONT_SIZES.h6 },
       body1: { fontWeight: 400, lineHeight: 1.6 },
       body2: { fontWeight: 400, lineHeight: 1.5 },
       // Una sola política de mayúsculas en todo el sitio (fin de las UPPERCASE).
       button: { textTransform: 'none', fontWeight: 600 },
     }
-  }), [mode]);
+  // disableAlign: mantiene la escala EXACTA (48/36/28/24/20/18). Con el default,
+  // alignProperty ajusta a una grilla de 4px y 3rem termina rindiendo 2.9545rem
+  // (≈47px), dejando el comment de FONT_SIZES en mentira. Mismo bug, otra capa.
+  }), { disableAlign: true }), [mode]);
 
   return (
     <ColorModeContext.Provider value={colorMode}>
